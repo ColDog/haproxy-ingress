@@ -134,7 +134,6 @@ frontend httpfront
     rspadd "Strict-Transport-Security: max-age={{ $cfg.HSTSMaxAge }}{{ if $cfg.HSTSIncludeSubdomains }}; includeSubDomains{{ end }}{{ if $cfg.HSTSPreload }}; preload{{ end }}" if is-https-to-http
 {{ end }}
 {{ range $server := $ing.HAServers }}
-{{ if $server.UseHTTPS }}
 {{ if $server.SSLRedirect }}
     redirect scheme https if ishost-{{ $server.HostnameLabel }}{{ if $hasHTTPStoHTTP }} !is-https-to-http{{ end }}
 {{ else }}
@@ -145,18 +144,15 @@ frontend httpfront
 {{ end }}
 {{ end }}
 {{ end }}
-{{ end }}
 {{/* Aliases loop */}}
 {{ range $server := $ing.HAServers }}
 {{ if ne $server.Alias "" }}
-{{ if $server.UseHTTPS }}
 {{ if $server.SSLRedirect }}
     redirect scheme https if ishost-{{ $server.HostnameLabel }}-alias{{ if $hasHTTPStoHTTP }} !is-https-to-http{{ end }}
 {{ else }}
 {{ range $location := $server.Locations }}
 {{ if $location.Rewrite.SSLRedirect }}
     redirect scheme https if ishost-{{ $server.HostnameLabel }}-alias{{ $location.HAMatchPath }}{{ if $hasHTTPStoHTTP }} !is-https-to-http{{ end }}
-{{ end }}
 {{ end }}
 {{ end }}
 {{ end }}
